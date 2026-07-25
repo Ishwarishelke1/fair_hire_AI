@@ -7,8 +7,9 @@ from utils.entity_extractor import extract_entities
 from utils.bias_detector import anonymize_resume 
 from utils.explanation_engine import generate_explanation
 from db import candidates
-import os
 
+import os
+from utils.interview_generator import generate_questions
 from utils.resume_parser import extract_text_from_pdf
 
 app = Flask(__name__)
@@ -45,7 +46,7 @@ def upload_resume():
     tokens = preprocess_text(extracted_text)
 
     skills = extract_skills(tokens)
-
+    questions = generate_questions(skills)
     job_description = request.form.get('job_description')
 
     match_score = calculate_similarity(
@@ -90,12 +91,13 @@ def upload_resume():
     "match_score": match_score,
 
     "final_score": final_score,
-
+    "interview_questions": questions,
     "entities": entities,
     "anonymous_resume": anonymous_text,
     "removed_items": removed_items,
     "fairness_score": fairness_score,
     "explanations": explanations
+    
 
 
     })
