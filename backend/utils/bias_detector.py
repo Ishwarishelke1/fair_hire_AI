@@ -13,13 +13,45 @@ GENDER_WORDS = [
     "her"
 ]
 
+# These words should NEVER be anonymized even if spaCy
+# incorrectly detects them as locations.
+
+IGNORE_LOCATIONS = {
+    "react",
+    "react.js",
+    "node",
+    "node.js",
+    "flask",
+    "numpy",
+    "pandas",
+    "python",
+    "java",
+    "javascript",
+    "mongodb",
+    "mysql",
+    "docker",
+    "aws",
+    "rest",
+    "rest api",
+    "github",
+    "linkedin",
+    "india",
+    "smart india hackathon",
+    "leetcode",
+    "power bi",
+    "scikit-learn"
+}
+
+
 def anonymize_resume(text, entities):
 
     anonymous_text = text
 
     removed_items = []
 
-    if entities["name"]:
+    # ---------------- Name ----------------
+
+    if entities.get("name"):
 
         anonymous_text = anonymous_text.replace(
             entities["name"],
@@ -28,7 +60,9 @@ def anonymize_resume(text, entities):
 
         removed_items.append("Candidate Name")
 
-    for email in entities["emails"]:
+    # ---------------- Email ----------------
+
+    for email in entities.get("emails", []):
 
         anonymous_text = anonymous_text.replace(
             email,
@@ -37,7 +71,9 @@ def anonymize_resume(text, entities):
 
         removed_items.append("Email")
 
-    for phone in entities["phones"]:
+    # ---------------- Phone ----------------
+
+    for phone in entities.get("phones", []):
 
         anonymous_text = anonymous_text.replace(
             phone,
@@ -46,14 +82,45 @@ def anonymize_resume(text, entities):
 
         removed_items.append("Phone")
 
-    for location in entities["locations"]:
+    # ---------------- LinkedIn ----------------
 
-        anonymous_text = anonymous_text.replace(
-            location,
-            "[LOCATION]"
+    anonymous_text = re.sub(
+        r"https?://(www\.)?linkedin\.com/[^\s]+",
+        "[LINKEDIN]",
+        anonymous_text,
+        flags=re.IGNORECASE
+    )
+
+    # ---------------- GitHub ----------------
+
+    anonymous_text = re.sub(
+        r"https?://(www\.)?github\.com/[^\s]+",
+        "[GITHUB]",
+        anonymous_text,
+        flags=re.IGNORECASE
+    )
+
+    # ---------------- Locations ----------------
+
+    for location in entities.get("locations", []):
+
+        location = location.strip()
+
+        if len(location) < 3:
+            continue
+
+        if location.lower() in IGNORE_LOCATIONS:
+            continue
+
+        anonymous_text = re.sub(
+            r"\b" + re.escape(location) + r"\b",
+            "[LOCATION]",
+            anonymous_text
         )
 
         removed_items.append("Location")
+
+    # ---------------- Gender ----------------
 
     words = anonymous_text.split()
 
@@ -61,11 +128,11 @@ def anonymize_resume(text, entities):
 
     for word in words:
 
-        if word.lower() not in GENDER_WORDS:
+        if word.lower().strip(".,") not in GENDER_WORDS:
             cleaned_words.append(word)
 
     anonymous_text = " ".join(cleaned_words)
 
-    fairness_score = 100 - len(set(removed_items))*5
+    fairness_score = max(0, 100 - len(set(removed_items)) * 5)
 
-    return anonymous_text, removed_items, fairness_score
+    return anonymous_text, list(set(removed_items)), fairness_score
