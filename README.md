@@ -319,8 +319,7 @@ Computer Engineering Student
 GitHub:
 https://github.com/Ishwarishelke1
 
-LinkedIn:
-(Add your LinkedIn URL)
+
 
 ---
 
