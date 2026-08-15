@@ -254,19 +254,6 @@ http://localhost:3000
 
 ---
 
-# 📸 Screenshots
-
-Add screenshots of:
-
-- Home Page
-- Resume Upload
-- AI Results
-- Candidate Information
-- Resume Feedback
-- Recruiter Dashboard
-- Candidate Ranking
-
----
 
 # 🚀 Future Enhancements
 
