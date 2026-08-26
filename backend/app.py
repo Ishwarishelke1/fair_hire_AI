@@ -113,22 +113,81 @@ def upload_resume():
 
     candidate_data = {
 
-        "name": entities.get("name", ""),
+    "name": entities.get("name", ""),
 
-        "skills": skills,
+    "skills": skills,
 
-        "match_score": match_score,
+    "match_score": match_score,
 
-        "final_score": final_score,
+    "final_score": final_score,
 
-        "emails": entities.get("emails", []),
+    "emails": entities.get("emails", []),
 
-        "organizations": entities.get("organizations", [])
+    "phones": entities.get("phones", []),
+
+    "locations": entities.get("locations", []),
+
+    "organizations": entities.get("organizations", []),
+
+    # Resume analysis
+    "resume_features": features,
+
+    "missing_skills": feedback_result.get("missing_skills", []),
+
+    "resume_feedback": feedback_result.get("feedback", []),
+
+    # Fairness
+    "fairness_score": fairness_score,
+
+    "removed_items": removed_items,
+
+    "anonymous_resume": anonymous_text,
+
+    # AI results
+    "recommended_roles":
+        recommendation.get("recommended_roles", []),
+
+    "hiring_decision":
+        recommendation.get("decision", ""),
+
+    "recommendation_reasons":
+        recommendation.get("reasons", []),
+
+    "explanations": explanations,
+
+    # Interview
+    "interview_questions": questions
 
     }
 
-    candidates.insert_one(candidate_data)
+    # Check whether this candidate already exists
+    existing_candidate = candidates.find_one({
 
+    "name": candidate_data["name"],
+
+    "emails": candidate_data["emails"]
+
+    })
+    if existing_candidate:
+        candidates.update_one(
+
+        {
+
+            "name": candidate_data["name"],
+
+            "emails": candidate_data["emails"]
+
+        },
+
+        {
+
+            "$set": candidate_data
+
+        }
+
+        )
+    else:
+        candidates.insert_one(candidate_data)
     # ---------------- Explainable AI ----------------
 
     explanations = generate_explanation(
@@ -197,3 +256,16 @@ def dashboard():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+@app.route("/ranking")
+def ranking():
+
+    data = list(
+        candidates.find({}, {"_id": 0})
+        .sort("final_score", -1)
+    )
+
+    for i, candidate in enumerate(data):
+        candidate["rank"] = i + 1
+
+    return jsonify(data)
