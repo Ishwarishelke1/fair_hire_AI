@@ -1,63 +1,90 @@
-KNOWN_SKILLS = [
-    "python",
-    "java",
-    "react",
-    "mongodb",
-    "mysql",
-    "docker",
-    "aws",
-    "git",
-    "flask",
-    "node.js",
-    "machine learning",
-    "sql",
-    "rest api"
-]
+import re
 
-def generate_feedback(candidate_skills, job_description):
 
-    jd = job_description.lower()
+def extract_required_skills(job_description):
 
-    print("\n==========================")
-    print("JOB DESCRIPTION:")
-    print(jd)
+    job_description = job_description.lower()
+
+    known_skills = [
+        "python",
+        "java",
+        "javascript",
+        "react",
+        "node",
+        "node.js",
+        "mongodb",
+        "sql",
+        "mysql",
+        "html",
+        "css",
+        "machine learning",
+        "data science",
+        "nlp",
+        "git",
+        "flask",
+        "django",
+        "spring boot",
+        "c++",
+        "c#",
+        "aws",
+        "docker",
+        "kubernetes",
+        "excel",
+        "power bi",
+        "tensorflow",
+        "pytorch"
+    ]
 
     required_skills = []
 
-    for skill in KNOWN_SKILLS:
-        if skill in jd:
+    for skill in known_skills:
+
+        if skill in job_description:
+
             required_skills.append(skill)
 
-    print("Required Skills:", required_skills)
+    return list(set(required_skills))
 
-    candidate_lower = [
-        skill.lower().strip()
+
+def generate_feedback(candidate_skills, job_description):
+
+    candidate_skills = [
+        str(skill).lower().strip()
         for skill in candidate_skills
     ]
 
-    print("Candidate Skills:", candidate_lower)
+    required_skills = extract_required_skills(
+        job_description
+    )
 
-    missing_skills = []
-
-    for skill in required_skills:
-        if skill not in candidate_lower:
-            missing_skills.append(skill)
-
-    print("Missing Skills:", missing_skills)
-    print("==========================\n")
+    missing_skills = [
+        skill
+        for skill in required_skills
+        if skill not in candidate_skills
+    ]
 
     feedback = []
 
-    if len(missing_skills) == 0:
-        feedback.append("Excellent match with job requirements.")
+    if missing_skills:
+
+        feedback.append(
+            "Consider improving the following skills: "
+            + ", ".join(missing_skills)
+        )
+
     else:
-        feedback.append("Learn the missing skills to improve your profile.")
 
-    if len(candidate_skills) < 5:
-        feedback.append("Add more technical skills to your resume.")
+        feedback.append(
+            "Excellent match with job requirements."
+        )
 
-    feedback.append("Include measurable project achievements.")
-    feedback.append("Add certifications if available.")
+    feedback.append(
+        "Include measurable project achievements."
+    )
+
+    feedback.append(
+        "Add certifications if available."
+    )
 
     return {
         "missing_skills": missing_skills,

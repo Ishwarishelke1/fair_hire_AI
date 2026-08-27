@@ -7,3 +7,4 @@ client = MongoClient(
 db = client["fair_hire_ai"]
 
 candidates = db["candidates"]
+users = db["users"]
