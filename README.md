@@ -100,7 +100,6 @@ FAIR-HIRE AI is an intelligent recruitment platform that automates resume screen
 - JavaScript
 - Tailwind CSS
 - Axios
-- React Toastify
 
 ## Backend
 - Flask
@@ -253,7 +252,6 @@ http://localhost:3000
 13. Display Candidate Ranking Dashboard
 
 ---
-
 
 # 🚀 Future Enhancements
 
