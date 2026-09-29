@@ -31,7 +31,6 @@ FAIR-HIRE AI is an intelligent recruitment platform that automates resume screen
 
 ### 💬 AI Interview Question Generator
 - Generates technical interview questions
-- Difficulty-wise questions
 
 ### 📊 Resume Feedback
 - Missing skill detection
